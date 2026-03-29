@@ -4,29 +4,30 @@ Vibe is a local-first note-taking and design tool built with Tauri and vanilla H
 
 ## Installation
 
-### macOS
-
-One-liner install:
+### macOS / Linux
 
 ```
 curl -fsSL https://raw.githubusercontent.com/groothipp/vibe/main/scripts/install.sh | bash
 ```
 
-This downloads the latest release, installs it to `/Applications`, and clears the macOS quarantine flag automatically.
+This downloads the latest release, installs it, and sets up the `vibe` CLI command.
 
-Or install manually: download the `.dmg` from the releases page, drag to Applications, then run `xattr -cr /Applications/Vibe\ Editor.app` to clear the quarantine flag.
+On macOS it installs to `/Applications` and clears the quarantine flag. On Linux it installs the `.deb`, `.rpm`, or `.AppImage` depending on your distro.
 
-### Linux
+Or install manually from the [releases page](https://github.com/groothipp/vibe/releases):
 
-Download from the releases page:
-
-- `.deb` (Debian/Ubuntu): `sudo dpkg -i vibe-editor*.deb`
-- `.rpm` (Fedora/RHEL): `sudo rpm -i vibe-editor*.rpm`
-- `.AppImage` (any distro): `chmod +x *.AppImage && ./*.AppImage`
+- macOS: `.dmg` (drag to Applications, then run `xattr -cr /Applications/Vibe\ Editor.app`)
+- Debian/Ubuntu: `.deb` (`sudo dpkg -i vibe-editor*.deb`)
+- Fedora/RHEL: `.rpm` (`sudo rpm -i vibe-editor*.rpm`)
+- Any distro: `.AppImage` (`chmod +x *.AppImage && ./*.AppImage`)
 
 ### Windows
 
-Download and run the `.msi` or `.exe` installer from the releases page.
+```
+irm https://raw.githubusercontent.com/groothipp/vibe/main/scripts/install.ps1 | iex
+```
+
+Or download and run the `.msi` installer from the [releases page](https://github.com/groothipp/vibe/releases).
 
 ### CLI
 
