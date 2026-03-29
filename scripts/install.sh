@@ -63,7 +63,7 @@ install_macos() {
   rm -rf "$TMPDIR"
 
   # Install CLI
-  APP_BIN="/Applications/Vibe Editor.app/Contents/MacOS/Vibe Editor"
+  APP_BIN="/Applications/Vibe Editor.app/Contents/MacOS/vibe-editor"
   install_cli_wrapper "$APP_BIN"
 
   echo ""
