@@ -7,7 +7,7 @@ Vibe is a local-first note-taking and design tool built with Tauri and vanilla H
 Download the latest release for your platform:
 
 - macOS: `.dmg` (drag to Applications)
-- Linux: `.deb` (install with `sudo dpkg -i`) or `.AppImage`
+- Linux: `.deb` (Debian/Ubuntu), `.rpm` (Fedora/RHEL), or `.AppImage` (any distro)
 - Windows: `.msi` or `.exe` installer
 
 On first launch, the app installs a `vibe` CLI command so you can open it from any terminal:

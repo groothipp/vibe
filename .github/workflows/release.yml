@@ -59,6 +59,7 @@ jobs:
             libsoup-3.0-dev \
             javascriptcoregtk-4.1 \
             libxdo-dev
+            rpm
 
       - name: Install JS dependencies
         run: bun install
@@ -83,6 +84,7 @@ jobs:
         run: |
           mkdir -p dist
           cp src-tauri/target/${{ matrix.target }}/release/bundle/deb/*.deb dist/ 2>/dev/null || true
+          cp src-tauri/target/${{ matrix.target }}/release/bundle/rpm/*.rpm dist/ 2>/dev/null || true
           cp src-tauri/target/${{ matrix.target }}/release/bundle/appimage/*.AppImage dist/ 2>/dev/null || true
 
       - name: Collect artifacts (Windows)
@@ -129,6 +131,7 @@ jobs:
             artifacts/vibe-macos-arm64/*.dmg
             artifacts/vibe-macos-x64/*.dmg
             artifacts/vibe-linux-x64/*.deb
+            artifacts/vibe-linux-x64/*.rpm
             artifacts/vibe-linux-x64/*.AppImage
             artifacts/vibe-windows-x64/*.msi
             artifacts/vibe-windows-x64/*.exe
