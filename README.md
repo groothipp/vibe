@@ -6,7 +6,7 @@ Vibe is a local-first note-taking and design tool built with Tauri and vanilla H
 
 Download the latest release for your platform:
 
-- macOS: `.dmg` (drag to Applications)
+- macOS: `.pkg` installer
 - Linux: `.deb` (Debian/Ubuntu), `.rpm` (Fedora/RHEL), or `.AppImage` (any distro)
 - Windows: `.msi` or `.exe` installer
 
@@ -20,6 +20,10 @@ vibe ~/projects # opens in ~/projects
 On macOS and Linux the CLI is installed to `/usr/local/bin/vibe`. On Windows a `vibe.cmd` is placed next to the app binary and added to PATH.
 
 All project files are stored under `.vibe/` in the target directory.
+
+### macOS: unsigned app warning
+
+macOS may show a warning since the app is not notarized. Right-click the `.pkg` file and select Open to bypass Gatekeeper, then proceed with the installation.
 
 ## Building
 
