@@ -73,39 +73,11 @@ jobs:
           tauriScript: bunx tauri
           args: --target ${{ matrix.target }}
 
-      - name: Build macOS installer (.pkg)
-        if: runner.os == 'macOS'
-        run: |
-          APP_PATH="src-tauri/target/${{ matrix.target }}/release/bundle/macos/Vibe Editor.app"
-          if [ ! -d "$APP_PATH" ]; then
-            echo "Error: .app bundle not found"
-            find src-tauri/target/${{ matrix.target }}/release/bundle -type d 2>/dev/null
-            exit 1
-          fi
-
-          # Create staging area with the .app
-          mkdir -p pkg-root/Applications
-          cp -R "$APP_PATH" pkg-root/Applications/
-
-          # Post-install script to clear quarantine
-          mkdir -p pkg-scripts
-          printf '#!/bin/bash\nxattr -cr "/Applications/Vibe Editor.app" 2>/dev/null || true\n' > pkg-scripts/postinstall
-          chmod +x pkg-scripts/postinstall
-
-          # Build the .pkg
-          pkgbuild \
-            --root pkg-root \
-            --scripts pkg-scripts \
-            --identifier com.vibe.editor \
-            --version "${GITHUB_REF_NAME#v}" \
-            --install-location / \
-            "vibe-editor-${{ matrix.label }}.pkg"
-
       - name: Collect artifacts (macOS)
         if: runner.os == 'macOS'
         run: |
           mkdir -p dist
-          cp *.pkg dist/ 2>/dev/null || true
+          cp src-tauri/target/${{ matrix.target }}/release/bundle/dmg/*.dmg dist/ 2>/dev/null || true
 
       - name: Collect artifacts (Linux)
         if: runner.os == 'Linux'
@@ -164,8 +136,8 @@ jobs:
           draft: true
           generate_release_notes: true
           files: |
-            artifacts/vibe-macos-arm64/*.pkg
-            artifacts/vibe-macos-x64/*.pkg
+            artifacts/vibe-macos-arm64/*.dmg
+            artifacts/vibe-macos-x64/*.dmg
             artifacts/vibe-linux-x64/*.deb
             artifacts/vibe-linux-x64/*.rpm
             artifacts/vibe-linux-x64/*.AppImage

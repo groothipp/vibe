@@ -4,11 +4,31 @@ Vibe is a local-first note-taking and design tool built with Tauri and vanilla H
 
 ## Installation
 
-Download the latest release for your platform:
+### macOS
 
-- macOS: `.pkg` installer
-- Linux: `.deb` (Debian/Ubuntu), `.rpm` (Fedora/RHEL), or `.AppImage` (any distro)
-- Windows: `.msi` or `.exe` installer
+One-liner install:
+
+```
+curl -fsSL https://raw.githubusercontent.com/groothipp/vibe/main/scripts/install.sh | bash
+```
+
+This downloads the latest release, installs it to `/Applications`, and clears the macOS quarantine flag automatically.
+
+Or install manually: download the `.dmg` from the releases page, drag to Applications, then run `xattr -cr /Applications/Vibe\ Editor.app` to clear the quarantine flag.
+
+### Linux
+
+Download from the releases page:
+
+- `.deb` (Debian/Ubuntu): `sudo dpkg -i vibe-editor*.deb`
+- `.rpm` (Fedora/RHEL): `sudo rpm -i vibe-editor*.rpm`
+- `.AppImage` (any distro): `chmod +x *.AppImage && ./*.AppImage`
+
+### Windows
+
+Download and run the `.msi` or `.exe` installer from the releases page.
+
+### CLI
 
 On first launch, the app installs a `vibe` CLI command so you can open it from any terminal:
 
@@ -20,10 +40,6 @@ vibe ~/projects # opens in ~/projects
 On macOS and Linux the CLI is installed to `/usr/local/bin/vibe`. On Windows a `vibe.cmd` is placed next to the app binary and added to PATH.
 
 All project files are stored under `.vibe/` in the target directory.
-
-### macOS: unsigned app warning
-
-macOS may show a warning since the app is not notarized. Right-click the `.pkg` file and select Open to bypass Gatekeeper, then proceed with the installation.
 
 ## Building
 
