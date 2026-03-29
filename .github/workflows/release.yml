@@ -77,12 +77,16 @@ jobs:
         if: runner.os == 'macOS'
         run: |
           mkdir -p dist
+          echo "=== Bundle output ==="
+          find src-tauri/target/${{ matrix.target }}/release/bundle -type f 2>/dev/null || echo "No bundle directory found"
           cp src-tauri/target/${{ matrix.target }}/release/bundle/dmg/*.dmg dist/ 2>/dev/null || true
 
       - name: Collect artifacts (Linux)
         if: runner.os == 'Linux'
         run: |
           mkdir -p dist
+          echo "=== Bundle output ==="
+          find src-tauri/target/${{ matrix.target }}/release/bundle -type f 2>/dev/null || echo "No bundle directory found"
           cp src-tauri/target/${{ matrix.target }}/release/bundle/deb/*.deb dist/ 2>/dev/null || true
           cp src-tauri/target/${{ matrix.target }}/release/bundle/rpm/*.rpm dist/ 2>/dev/null || true
           cp src-tauri/target/${{ matrix.target }}/release/bundle/appimage/*.AppImage dist/ 2>/dev/null || true
@@ -92,6 +96,8 @@ jobs:
         shell: pwsh
         run: |
           New-Item -ItemType Directory -Force -Path dist
+          Write-Host "=== Bundle output ==="
+          Get-ChildItem -Recurse src-tauri/target/${{ matrix.target }}/release/bundle -ErrorAction SilentlyContinue | Select-Object FullName
           Copy-Item src-tauri/target/${{ matrix.target }}/release/bundle/msi/*.msi dist/ -ErrorAction SilentlyContinue
           Copy-Item src-tauri/target/${{ matrix.target }}/release/bundle/nsis/*.exe dist/ -ErrorAction SilentlyContinue
 
@@ -110,6 +116,9 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           path: artifacts
+
+      - name: List downloaded artifacts
+        run: find artifacts -type f
 
       - name: Determine tag
         id: tag
