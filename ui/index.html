@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vibe Editor</title>
+  <link rel="stylesheet" href="style.css" />
+  <!-- xterm.js for terminal -->
+  <link rel="stylesheet" href="vendor/xterm.min.css" />
+  <script src="vendor/xterm.min.js"></script>
+  <script src="vendor/addon-fit.min.js"></script>
+  <!-- marked.js for markdown rendering -->
+  <script src="vendor/marked.min.js"></script>
+  <!-- highlight.js for code syntax highlighting -->
+  <link rel="stylesheet" href="vendor/hljs-github-dark.min.css" />
+  <script src="vendor/hljs-core.min.js"></script>
+  <script src="vendor/hljs-javascript.min.js"></script>
+  <script src="vendor/hljs-python.min.js"></script>
+  <script src="vendor/hljs-rust.min.js"></script>
+  <script src="vendor/hljs-bash.min.js"></script>
+  <script src="vendor/hljs-typescript.min.js"></script>
+  <script src="vendor/hljs-json.min.js"></script>
+  <script src="vendor/hljs-css.min.js"></script>
+  <script src="vendor/hljs-xml.min.js"></script>
+  <!-- jsPDF for PDF export -->
+  <script src="vendor/jspdf.min.js" defer></script>
+  <!-- mermaid.js for UML diagram rendering (defer to avoid blocking) -->
+  <script>window.mermaid_config = { startOnLoad: false };</script>
+  <script src="vendor/mermaid.min.js" defer></script>
+  <!-- js-yaml for .view file parsing -->
+  <script src="view-editor/vendor/js-yaml.min.js" defer></script>
+</head>
+<body>
+  <!-- Top bar -->
+  <header id="topbar">
+    <div class="topbar-left">
+      <button id="sidebar-toggle" title="Toggle file browser">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M3 6h18M3 12h18M3 18h18"/>
+        </svg>
+      </button>
+      <span id="app-title">vibe</span>
+      <span id="current-file-path"></span>
+    </div>
+    <div class="topbar-right"></div>
+  </header>
+
+  <div id="main-container">
+    <!-- Sidebar: file tree -->
+    <aside id="sidebar">
+      <div id="sidebar-header">
+        <span>.vibe/</span>
+      </div>
+      <div id="sidebar-sections">
+        <div id="file-tree"></div>
+        <div id="resources-section">
+          <div class="section-header" data-section="resources">
+            <span class="section-label">Resources</span>
+          </div>
+          <div id="resources-tree"></div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Editor panel -->
+    <div id="editor-panel">
+      <div id="editor-welcome" class="welcome">
+        <h2>Welcome to Vibe</h2>
+        <p>Select a note from the sidebar or create a new one to begin.</p>
+      </div>
+      <div id="editor-container" style="display:none;">
+        <div id="blocks-container"></div>
+      </div>
+      <div id="uml-editor" style="display:none;">
+        <div id="uml-toolbar">
+          <span id="uml-toolbar-label">UML</span>
+          <button id="uml-insert-template" title="Insert template">Template ▾</button>
+          <span id="uml-status-dot"></span>
+          <button id="uml-toggle-preview" title="Toggle preview (Cmd+R)">Preview</button>
+        </div>
+        <textarea id="uml-textarea" spellcheck="false" placeholder="Enter Mermaid diagram syntax…"></textarea>
+      </div>
+
+      <!-- View picker modal -->
+      <div id="ve-view-picker" style="display:none;">
+        <div class="ve-picker-backdrop"></div>
+        <div class="ve-picker-panel">
+          <div class="ve-picker-header">
+            <span>Add View Component</span>
+            <button id="ve-picker-close">✕</button>
+          </div>
+          <div id="ve-picker-list"></div>
+          <div class="ve-picker-empty" id="ve-picker-empty">No .view files found in project</div>
+        </div>
+      </div>
+
+      <!-- View Editor (for .view files) -->
+      <div id="view-editor" style="display:none;">
+        <div id="ve-toolbar">
+          <div class="ve-toolbar-group">
+            <button id="ve-back" title="Back to notes (Esc)">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M10 2L4 8l6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <span id="ve-file-name" style="font-size:12px;color:var(--text-secondary);margin:0 4px;"></span>
+
+          </div>
+
+          <div class="ve-toolbar-sep"></div>
+
+          <div class="ve-toolbar-group" id="ve-tools">
+            <button class="ve-tool-btn active" data-tool="select" title="Select (V)">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M3 1l10 7.5-4.5.5L6 13z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+            </button>
+            <button class="ve-tool-btn" data-tool="frame" title="Frame (F)">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.5"/></svg>
+            </button>
+            <button class="ve-tool-btn" data-tool="text" title="Text (T)">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M4 3h8M8 3v10M6 13h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            </button>
+            <button class="ve-tool-btn" data-tool="button" title="Button (B)">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><rect x="1" y="4" width="14" height="8" rx="3" stroke="currentColor" stroke-width="1.5"/><path d="M5 8h6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            </button>
+            <button class="ve-tool-btn" data-tool="input" title="Input (I)">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><rect x="1" y="4" width="14" height="8" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M4 6v4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            </button>
+            <button class="ve-tool-btn" data-tool="image" title="Image (G)">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.5"/><circle cx="5.5" cy="5.5" r="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M2 11l3-3 2 2 3-3 4 4" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+            </button>
+            <button class="ve-tool-btn" data-tool="divider" title="Divider (D)">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M2 8h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            </button>
+          </div>
+
+          <div class="ve-toolbar-sep"></div>
+
+          <div class="ve-toolbar-group">
+            <button id="ve-add-view" title="View (W)">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.5"/><rect x="9" y="1" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.5"/><rect x="1" y="9" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.5"/><rect x="9" y="9" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.5"/></svg>
+
+            </button>
+          </div>
+
+          <div class="ve-toolbar-sep"></div>
+
+          <div class="ve-toolbar-group" id="ve-canvas-controls">
+            <input type="number" id="ve-canvas-w" value="390" min="200" max="3000" step="10" title="Canvas width">
+            <span class="ve-dim">×</span>
+            <input type="number" id="ve-canvas-h" value="844" min="200" max="3000" step="10" title="Canvas height">
+
+          </div>
+
+          <div class="ve-toolbar-right">
+            <span id="ve-zoom-display">100%</span>
+            <button id="ve-zoom-in" title="Zoom In">+</button>
+            <button id="ve-zoom-out" title="Zoom Out">−</button>
+            <button id="ve-zoom-fit" title="Fit to View">⊡</button>
+          </div>
+        </div>
+
+        <div id="ve-body">
+          <!-- Layer tree -->
+          <div id="ve-layers">
+            <div class="ve-panel-header">Layers</div>
+            <div id="ve-layer-tree"></div>
+          </div>
+
+          <div class="ve-resize-handle" id="ve-resize-left"></div>
+
+          <!-- Canvas -->
+          <div id="ve-canvas-area">
+            <div id="ve-canvas-scroll">
+              <div id="ve-canvas-bg">
+                <div id="ve-canvas" tabindex="0"></div>
+                <div id="ve-selection-overlay"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="ve-resize-handle" id="ve-resize-right"></div>
+
+          <!-- Properties -->
+          <div id="ve-props">
+            <div class="ve-panel-header" id="ve-props-title">Properties</div>
+            <div id="ve-props-content">
+              <div class="ve-props-empty">Select an element</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Resize handle -->
+    <div id="resize-handle"></div>
+
+    <!-- Terminal / Preview panel -->
+    <div id="terminal-panel">
+      <div id="uml-preview-panel" style="display:none;">
+        <div id="uml-preview-toolbar">
+          <button id="uml-zoom-out" title="Zoom out">−</button>
+          <button id="uml-zoom-reset" title="Reset zoom">1:1</button>
+          <button id="uml-zoom-in" title="Zoom in">+</button>
+          <button id="uml-export-pdf" title="Export PDF">Export PDF</button>
+        </div>
+        <div id="uml-preview-container">
+          <div id="uml-preview-content"></div>
+        </div>
+      </div>
+      <div id="terminal-header">
+        <div id="terminal-tabs">
+          <button id="terminal-tab-add" title="New terminal">+</button>
+        </div>
+      </div>
+      <div id="terminal-container"></div>
+    </div>
+  </div>
+
+  <script src="app.js" defer></script>
+</body>
+</html>

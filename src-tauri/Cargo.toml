@@ -1,0 +1,25 @@
+[package]
+name = "vibe-editor"
+version = "0.1.0"
+edition = "2021"
+license = "GPL-3.0"
+
+[dependencies]
+tauri = { version = "2", features = ["unstable", "custom-protocol"] }
+tauri-plugin-shell = "2"
+tauri-plugin-dialog = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+portable-pty = "0.8"
+walkdir = "2"
+uuid = { version = "1", features = ["v4"] }
+parking_lot = "0.12"
+base64 = "0.22"
+dirs = "5"
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[lib]
+name = "vibe_editor_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]

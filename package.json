@@ -1,0 +1,20 @@
+{
+  "name": "vibe-editor",
+  "version": "0.1.0",
+  "private": true,
+  "license": "GPL-3.0",
+  "scripts": {
+    "dev": "bunx @tauri-apps/cli dev",
+    "build": "cd src-tauri && cargo build --release && cd ../cli && cargo build --release",
+    "serve": "bunx serve ui -p 8080 --no-clipboard",
+    "view-editor": "cd ui/view-editor && python3 -m http.server 8090"
+  },
+  "devDependencies": {
+    "@tauri-apps/api": "^2",
+    "@tauri-apps/cli": "^2",
+    "serve": "^14"
+  },
+  "dependencies": {
+    "@tauri-apps/plugin-dialog": "^2.6.0"
+  }
+}

@@ -1,0 +1,21 @@
+#!/bin/bash
+# Wrapper script for the Vibe CLI.
+# Alias this: alias vibe="/path/to/vibe/vibe"
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+CLI_BIN="$SCRIPT_DIR/cli/target/debug/vibe"
+APP_BIN="$SCRIPT_DIR/src-tauri/target/debug/vibe-editor"
+
+# Prefer release builds
+[ -f "$SCRIPT_DIR/cli/target/release/vibe" ] && CLI_BIN="$SCRIPT_DIR/cli/target/release/vibe"
+[ -f "$SCRIPT_DIR/src-tauri/target/release/vibe-editor" ] && APP_BIN="$SCRIPT_DIR/src-tauri/target/release/vibe-editor"
+
+if [ ! -f "$CLI_BIN" ]; then
+  echo "Error: CLI not built. Run: cd $SCRIPT_DIR/cli && cargo build" >&2
+  exit 1
+fi
+
+# Clear macOS quarantine/provenance on all relevant binaries
+xattr -cr "$0" "$CLI_BIN" "$APP_BIN" 2>/dev/null
+
+exec "$CLI_BIN" "$@"

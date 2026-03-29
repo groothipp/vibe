@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vibe — View Editor</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- ── Toolbar ── -->
+  <div id="toolbar">
+    <div class="toolbar-group">
+      <button id="btn-new" title="New View">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 1h7l3 3v9a2 2 0 01-2 2H3a2 2 0 01-2-2V3a2 2 0 012-2z" stroke="currentColor" stroke-width="1.5"/><path d="M6 8h4M8 6v4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        <span>New</span>
+      </button>
+      <button id="btn-open" title="Open View">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 4h4l2 2h6v7a1 1 0 01-1 1H2a1 1 0 01-1-1V5a1 1 0 011-1z" stroke="currentColor" stroke-width="1.5"/></svg>
+        <span>Open</span>
+      </button>
+      <button id="btn-save" title="Save View (Cmd+S)">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M13 15H3a2 2 0 01-2-2V3a2 2 0 012-2h8l4 4v8a2 2 0 01-2 2z" stroke="currentColor" stroke-width="1.5"/><path d="M5 15v-5h6v5M5 1v3h4" stroke="currentColor" stroke-width="1.5"/></svg>
+        <span>Save</span>
+      </button>
+    </div>
+
+    <div class="toolbar-separator"></div>
+
+    <div class="toolbar-group" id="tools">
+      <button class="tool-btn active" data-tool="select" title="Select (V)">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 1l10 7.5-4.5.5L6 13z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+      </button>
+      <button class="tool-btn" data-tool="frame" title="Frame (F)">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.5"/></svg>
+      </button>
+      <button class="tool-btn" data-tool="text" title="Text (T)">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 3h8M8 3v10M6 13h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      </button>
+      <button class="tool-btn" data-tool="button" title="Button (B)">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1" y="4" width="14" height="8" rx="3" stroke="currentColor" stroke-width="1.5"/><path d="M5 8h6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      </button>
+      <button class="tool-btn" data-tool="input" title="Input (I)">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1" y="4" width="14" height="8" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M4 6v4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      </button>
+      <button class="tool-btn" data-tool="image" title="Image (G)">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.5"/><circle cx="5.5" cy="5.5" r="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M2 11l3-3 2 2 3-3 4 4" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+      </button>
+      <button class="tool-btn" data-tool="divider" title="Divider (D)">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 8h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+
+    <div class="toolbar-separator"></div>
+
+    <!-- Canvas size / device picker -->
+    <div class="toolbar-group" id="canvas-controls">
+      <label>Canvas:</label>
+      <input type="number" id="canvas-w" value="390" min="200" max="3000" step="10">
+      <span class="dim">×</span>
+      <input type="number" id="canvas-h" value="844" min="200" max="3000" step="10">
+      <div class="device-presets">
+        <button data-w="390" data-h="844" title="iPhone 15">📱</button>
+        <button data-w="768" data-h="1024" title="iPad Mini">📋</button>
+        <button data-w="1280" data-h="800" title="Laptop">💻</button>
+        <button data-w="1920" data-h="1080" title="Desktop">🖥️</button>
+      </div>
+    </div>
+
+    <div class="toolbar-right">
+      <div class="toolbar-group">
+        <button id="btn-undo" title="Undo (Cmd+Z)">↩</button>
+        <button id="btn-redo" title="Redo (Cmd+Shift+Z)">↪</button>
+      </div>
+      <div class="toolbar-group">
+        <span id="zoom-display">100%</span>
+        <button id="btn-zoom-in" title="Zoom In">+</button>
+        <button id="btn-zoom-out" title="Zoom Out">−</button>
+        <button id="btn-zoom-fit" title="Fit to View">⊡</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Main Layout ── -->
+  <div id="main">
+    <!-- Layer tree panel -->
+    <div id="layer-panel">
+      <div class="panel-header">
+        <span>Layers</span>
+      </div>
+      <div id="layer-tree"></div>
+    </div>
+
+    <!-- Canvas area -->
+    <div id="canvas-area">
+      <div id="canvas-scroll">
+        <div id="canvas-viewport">
+          <div id="canvas-bg">
+            <div id="canvas" tabindex="0"></div>
+            <!-- Selection overlays rendered here -->
+            <div id="selection-overlay"></div>
+            <!-- Guides -->
+            <div id="guides-overlay"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Properties panel -->
+    <div id="props-panel">
+      <div class="panel-header">
+        <span id="props-title">Properties</span>
+      </div>
+      <div id="props-content">
+        <div class="props-empty">Select an element to edit its properties</div>
+      </div>
+    </div>
+  </div>
+
+  <script src="vendor/js-yaml.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

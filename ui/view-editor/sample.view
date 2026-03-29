@@ -1,0 +1,168 @@
+name: Login Screen
+canvas:
+  width: 390
+  height: 844
+
+tokens:
+  colors:
+    primary: "#6366F1"
+    surface: "#1A1A1A"
+    bg: "#0A0A0A"
+    border: "#333333"
+    text: "#FFFFFF"
+    muted: "#666666"
+  typography:
+    body:
+      fontSize: 16
+      fontWeight: 400
+    button:
+      fontSize: 16
+      fontWeight: 600
+    caption:
+      fontSize: 14
+      fontWeight: 400
+  spacing:
+    sm: 8
+    md: 16
+    lg: 24
+    xl: 32
+
+tree:
+  - id: root
+    type: frame
+    name: Background
+    style:
+      width: "100%"
+      height: "100%"
+      background: "$colors.bg"
+      display: flex
+      flexDirection: column
+      alignItems: center
+      justifyContent: center
+      padding: "$spacing.lg"
+      gap: "$spacing.xl"
+
+    children:
+      - id: logo
+        type: frame
+        name: Logo
+        style:
+          width: 80
+          height: 80
+          borderRadius: 16
+          background: "linear-gradient(135deg, #6366F1, #8B5CF6)"
+
+      - id: heading
+        type: text
+        name: Welcome Title
+        text: "Welcome back"
+        style:
+          color: "$colors.text"
+          fontSize: 28
+          fontWeight: 700
+          textAlign: center
+
+      - id: subtitle
+        type: text
+        name: Subtitle
+        text: "Sign in to your account"
+        style:
+          color: "$colors.muted"
+          apply: "$typography.caption"
+          textAlign: center
+
+      - id: form
+        type: frame
+        name: Login Form
+        style:
+          width: "100%"
+          display: flex
+          flexDirection: column
+          gap: "$spacing.md"
+
+        children:
+          - id: email-input
+            type: input
+            name: Email Field
+            placeholder: "Email address"
+            style:
+              height: 48
+              background: "$colors.surface"
+              borderRadius: 8
+              border: "1px solid $colors.border"
+              color: "$colors.text"
+              apply: "$typography.body"
+              padding: "0 16px"
+              responsive:
+                - above: 768
+                  height: 56
+                  fontSize: 18
+
+          - id: password-input
+            type: input
+            name: Password Field
+            placeholder: "Password"
+            style:
+              height: 48
+              background: "$colors.surface"
+              borderRadius: 8
+              border: "1px solid $colors.border"
+              color: "$colors.text"
+              apply: "$typography.body"
+              padding: "0 16px"
+
+          - id: login-btn
+            type: button
+            name: Sign In Button
+            text: "Sign In"
+            style:
+              height: 48
+              background: "$colors.primary"
+              borderRadius: 8
+              color: "$colors.text"
+              apply: "$typography.button"
+              responsive:
+                - above: 768
+                  height: 56
+
+      - id: divider-row
+        type: frame
+        name: Divider Row
+        style:
+          width: "100%"
+          display: flex
+          alignItems: center
+          gap: "$spacing.md"
+
+        children:
+          - id: divider-left
+            type: divider
+            name: Left Line
+            style:
+              width: "100%"
+              height: 1
+              background: "$colors.border"
+
+          - id: or-text
+            type: text
+            name: Or Text
+            text: "or"
+            style:
+              color: "$colors.muted"
+              fontSize: 12
+
+          - id: divider-right
+            type: divider
+            name: Right Line
+            style:
+              width: "100%"
+              height: 1
+              background: "$colors.border"
+
+      - id: footer
+        type: text
+        name: Footer Text
+        text: "Don't have an account? Sign up"
+        style:
+          color: "$colors.muted"
+          apply: "$typography.caption"
