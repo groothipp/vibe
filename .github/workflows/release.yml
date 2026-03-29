@@ -90,9 +90,9 @@ jobs:
           # Post-install script to clear quarantine
           mkdir -p pkg-scripts
           cat > pkg-scripts/postinstall << 'SCRIPT'
-          #!/bin/bash
-          xattr -cr "/Applications/Vibe Editor.app" 2>/dev/null || true
-          SCRIPT
+#!/bin/bash
+xattr -cr "/Applications/Vibe Editor.app" 2>/dev/null || true
+SCRIPT
           chmod +x pkg-scripts/postinstall
 
           # Build the .pkg
@@ -100,7 +100,7 @@ jobs:
             --root pkg-root \
             --scripts pkg-scripts \
             --identifier com.vibe.editor \
-            --version ${{ github.ref_name }} \
+            --version "${GITHUB_REF_NAME#v}" \
             --install-location / \
             "vibe-editor-${{ matrix.label }}.pkg"
 
@@ -135,6 +135,7 @@ jobs:
         with:
           name: vibe-${{ matrix.label }}
           path: dist/
+          if-no-files-found: warn
 
   release:
     needs: build
