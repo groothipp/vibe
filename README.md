@@ -1,6 +1,123 @@
 # Vibe
 
-Vibe is a local-first note-taking and design tool built with Tauri and vanilla HTML/CSS/JS. It runs as a native desktop app and stores everything as flat files in a `.vibe/` directory inside whatever folder you point it at.
+> A prototyping editor for building applications with agentic coding.
+
+Vibe is a desktop editor designed around the workflow of prototyping applications with AI coding agents. It combines a markdown editor, a UML diagram editor, and a visual UI editor with a custom `.view` file format that is specifically structured to be readable and writable by AI. Everything is stored as flat files in a `.vibe/` directory, making it easy for agents to read your designs and translate them directly into code. An integrated terminal keeps your shell, your notes, your diagrams, and your UI prototypes in one place.
+
+Built with Tauri 2 and vanilla HTML/CSS/JS. No frameworks, no cloud, no accounts. Local-first and GPL-3.0 licensed.
+
+---
+
+### Contents
+
+- [Features](#features)
+  - [Markdown Editor](#markdown-editor)
+  - [UML Diagram Editor](#uml-diagram-editor)
+  - [View Editor (.view files)](#view-editor-view-files)
+  - [Integrated Terminal](#integrated-terminal)
+  - [File Management](#file-management)
+  - [Theming](#theming)
+  - [Keyboard Shortcuts](#keyboard-shortcuts)
+- [Installation](#installation)
+  - [macOS / Linux](#macos--linux)
+  - [Windows](#windows)
+  - [CLI](#cli)
+- [Building from Source](#building-from-source)
+- [Architecture](#architecture)
+- [License](#license)
+
+---
+
+## Features
+
+### Markdown Editor
+
+Notes are `.md` files with a block-based editing model. Content is split into blocks at blank lines. Click any block to edit its raw markdown source. Click away or press Shift+Enter to see the rendered output.
+
+- Headings, bold, italic, links, images, blockquotes, tables, lists, task checkboxes, horizontal rules
+- Syntax-highlighted code blocks (JavaScript, TypeScript, Python, Rust, Bash, JSON, CSS, HTML/XML)
+- Press Enter on an empty line to create a new block below
+- Backspace in an empty block deletes it
+- Arrow keys at the top or bottom of a block navigate to the adjacent block
+
+### UML Diagram Editor
+
+Diagrams are `.mmd` files using Mermaid syntax. The editor provides a text area on the left and a live-rendered preview on the right.
+
+- Real-time preview with a status indicator (green for valid, red for errors — hover to see the message)
+- Built-in templates for class diagrams, sequence diagrams, state diagrams, ER diagrams, flowcharts, Gantt charts, git graphs, mindmaps, timelines, pie charts, and component diagrams
+- Zoom controls on the preview (buttons, Cmd+/-, Cmd+scroll)
+- Export diagrams to PDF with a native save dialog
+- Toggle the preview panel with the Preview button or Cmd+R
+
+### View Editor (.view files)
+
+The `.view` format is a YAML-based UI layout format designed to be readable and editable by both humans and AI agents. An AI can read a `.view` file to understand a UI design and generate corresponding code, or create a `.view` file from a description. The format supports:
+
+- **Element types**: frame, text, button, input, image, divider
+- **Layout**: flexbox properties (direction, align, justify, gap, wrap), overflow
+- **Styling**: background, border, border radius, opacity, box shadow, typography (color, size, weight, alignment)
+- **Design tokens**: reusable colors, typography groups, and spacing values defined in the file header, referenced with `$category.name` syntax (e.g. `$colors.primary`). Typography groups can be spread into a style with the `apply` key.
+- **Responsive breakpoints**: style overrides that activate above a specified canvas width
+- **Imports**: reference other `.view` files as reusable components
+
+The visual editor opens in a full-screen view with three panels:
+
+- **Layer tree** (left): shows the element hierarchy. Drag and drop to reorder or reparent. Double-click to rename. Right-click for add, duplicate, and delete options.
+- **Canvas** (center): renders the live UI. Configurable width and height. Zoom with +/- buttons, Cmd+scroll, or fit-to-view. Click elements to select them, drag handles to resize, drag to move absolutely-positioned elements.
+- **Properties** (right): edit the selected element's name, layout, size, spacing, appearance, typography, position, and responsive breakpoints.
+
+Drawing tools on the toolbar: Frame (F), Text (T), Button (B), Input (I), Image (G), Divider (D), Select (V). Press W to import another `.view` file as a component.
+
+A "Sample View" option in the sidebar context menu creates a fully commented example file demonstrating every feature of the format.
+
+### Integrated Terminal
+
+A terminal panel on the right side of the window backed by a real PTY.
+
+- Multiple tabs — click + to add, x to close
+- Resizable divider between the editor and terminal
+- Shell exit is indicated with a strikethrough tab label
+- Cmd+T creates a new tab when the terminal is focused
+
+### File Management
+
+The sidebar shows all files in `.vibe/`. Notes (`.md`, `.mmd`, `.view`) appear in the main tree. Other files (images, data, etc.) appear in a collapsible Resources section.
+
+- Create notes, diagrams, views, and folders via right-click context menu
+- Rename by triple-clicking a name in the sidebar or via context menu (duplicate names are detected and blocked)
+- Delete via context menu with a confirmation dialog
+- Drag and drop files and folders to reorganize (name conflicts shown in red)
+- Folder collapse state persists across sessions
+- Cmd+N opens a quick create dialog (type a path like `folder/note.md` to create with intermediate directories)
+- Cmd+O opens a quick open dialog with fuzzy matching
+- A filesystem watcher auto-refreshes the sidebar when files change externally
+
+### Theming
+
+Shift+Cmd+T opens a theme editor where every UI color is configurable: backgrounds, text colors, accent, border, success, error, inline code. Changes preview in real time. Theme is stored globally at `~/.config/vibe/theme.json` and applies across all projects.
+
+### Keyboard Shortcuts
+
+| Shortcut | Action |
+|---|---|
+| Cmd+N | Quick create file |
+| Cmd+O | Quick open file |
+| Cmd+B | Toggle sidebar |
+| Cmd+R | Toggle diagram preview (in .mmd files) |
+| Cmd+T | New terminal tab (when terminal focused) |
+| Shift+Cmd+T | Open theme editor |
+| Cmd+Z | Undo (view editor) |
+| Shift+Cmd+Z | Redo (view editor) |
+| Cmd+D | Duplicate element (view editor) |
+| Cmd+/Cmd- | Zoom diagram preview |
+| Esc | Exit view editor / close dialogs |
+| Shift+Enter | Close current block (markdown editor) |
+| V / F / T / B / I / G / D | Tool selection (view editor) |
+| W | Import view component (view editor) |
+| Delete / Backspace | Delete selected element (view editor) |
+
+---
 
 ## Installation
 
@@ -10,16 +127,14 @@ Vibe is a local-first note-taking and design tool built with Tauri and vanilla H
 curl -fsSL https://raw.githubusercontent.com/groothipp/vibe/main/scripts/install.sh | bash
 ```
 
-This downloads the latest release, installs it, and sets up the `vibe` CLI command.
+Downloads the latest release, installs it, and sets up the `vibe` CLI command. On macOS it installs to `/Applications` and clears the quarantine flag. On Linux it installs the `.deb`, `.rpm`, or `.AppImage` depending on your distro.
 
-On macOS it installs to `/Applications` and clears the quarantine flag. On Linux it installs the `.deb`, `.rpm`, or `.AppImage` depending on your distro.
+Manual install from the [releases page](https://github.com/groothipp/vibe/releases):
 
-Or install manually from the [releases page](https://github.com/groothipp/vibe/releases):
-
-- macOS: `.dmg` (drag to Applications, then run `xattr -cr /Applications/Vibe\ Editor.app`)
-- Debian/Ubuntu: `.deb` (`sudo dpkg -i vibe-editor*.deb`)
-- Fedora/RHEL: `.rpm` (`sudo rpm -i vibe-editor*.rpm`)
-- Any distro: `.AppImage` (`chmod +x *.AppImage && ./*.AppImage`)
+- macOS: `.dmg` — drag to Applications, then run `xattr -cr /Applications/Vibe\ Editor.app`
+- Debian / Ubuntu: `sudo dpkg -i vibe-editor*.deb`
+- Fedora / RHEL: `sudo rpm -i vibe-editor*.rpm`
+- Any distro: `chmod +x *.AppImage && ./*.AppImage`
 
 ### Windows
 
@@ -31,18 +146,18 @@ Or download and run the `.msi` installer from the [releases page](https://github
 
 ### CLI
 
-On first launch, the app installs a `vibe` CLI command so you can open it from any terminal:
+On first launch (or via the install scripts above), a `vibe` command is installed so you can open the editor from any terminal:
 
 ```
-vibe            # opens in current directory
-vibe ~/projects # opens in ~/projects
+vibe              # open in current directory
+vibe ~/myproject  # open in a specific directory
 ```
 
-On macOS and Linux the CLI is installed to `/usr/local/bin/vibe`. On Windows a `vibe.cmd` is placed next to the app binary and added to PATH.
+All project files are stored in a `.vibe/` directory inside the target folder.
 
-All project files are stored under `.vibe/` in the target directory.
+---
 
-## Building
+## Building from Source
 
 Requires Rust and Bun.
 
@@ -51,7 +166,7 @@ bun install
 bun run build
 ```
 
-This builds both the Tauri app (`src-tauri/target/release/vibe-editor`) and the CLI (`cli/target/release/vibe`).
+This builds the Tauri app (`src-tauri/target/release/vibe-editor`) and the CLI (`cli/target/release/vibe`).
 
 For development with hot reload:
 
@@ -59,110 +174,16 @@ For development with hot reload:
 bun run dev
 ```
 
-## Features
+---
 
-### Notes (Markdown)
+## Architecture
 
-- Notes are `.md` files stored in `.vibe/`.
-- Block-based editor: content is split into blocks separated by blank lines. Click a block to edit its raw markdown. Click away or press Shift+Enter to deactivate and see the rendered output.
-- Rendered markdown supports headings, bold, italic, links, images, code blocks, blockquotes, tables, lists, task checkboxes, and horizontal rules.
-- Code blocks get syntax highlighting (JavaScript, TypeScript, Python, Rust, Bash, JSON, CSS, HTML/XML).
-- Press Enter on an empty line at the end of a block to create a new block below. Press Backspace in an empty block to delete it.
-- Arrow keys at the top/bottom of a block navigate to the adjacent block.
+- **Frontend**: Vanilla HTML, CSS, and JS with no build step. Vendor libraries (marked.js, highlight.js, mermaid.js, xterm.js, jsPDF, js-yaml) are included as pre-built files in `ui/vendor/`.
+- **Backend**: Rust via Tauri 2. Handles file I/O, directory watching, and PTY management using the `portable-pty` crate.
+- **CLI**: A small wrapper script installed to `/usr/local/bin/vibe` (macOS/Linux) or as `vibe.cmd` (Windows) that launches the app in a target directory.
+- **Storage**: All project data lives in `.vibe/` directories. No database, no cloud, no accounts.
 
-### Diagrams (Mermaid)
-
-- Diagrams are `.mmd` files stored in `.vibe/`.
-- Full-screen text editor with Mermaid syntax. A live preview panel renders the diagram in real time.
-- Status dot in the toolbar turns green on valid syntax and red on errors. Hover the dot to see the error message.
-- Template button inserts starter code for: class diagram, sequence diagram, state diagram, ER diagram, flowchart (TD and LR), Gantt chart, git graph, mindmap, timeline, pie chart, and component diagram.
-- Preview panel has zoom controls (buttons, Cmd+/Cmd-, scroll wheel with Cmd held).
-- Export to PDF with the Export PDF button. Uses a native save dialog.
-- Toggle preview with the Preview button or Cmd+R.
-
-### View Editor (.view files)
-
-- Views are `.view` files written in YAML that describe UI layouts. They are meant to be readable by both humans and AI to help translate designs into code.
-- Opening a `.view` file enters a full-screen visual editor with three panels: layer tree, canvas, and properties.
-- Canvas has configurable width and height. Zoom with +/- buttons, Cmd+scroll, or the fit-to-view button.
-- Drawing tools on the toolbar: Frame (F), Text (T), Button (B), Input (I), Image (G), Divider (D). Press V to switch back to the select tool.
-- Click and drag on the canvas with a drawing tool to place a new element.
-- Select an element on the canvas or in the layer tree to see and edit its properties: layout (display, flex direction, align, justify, gap, overflow), size (width, height, min/max), spacing (padding, margin), appearance (background, border, radius, opacity, shadow), typography (color, size, weight, align), and position (relative, absolute, fixed, top/left/bottom/right).
-- Responsive breakpoints: add style overrides that apply above a specified canvas width.
-- Design tokens: define reusable colors, typography groups, and spacing values in the YAML. Reference them with `$category.name` syntax (e.g. `$colors.primary`). Typography token groups can be spread into a style with the `apply` key.
-- Layer tree supports drag and drop to reorder and reparent elements. Double-click a layer name to rename it. Right-click for a context menu with add, rename, duplicate, and delete options.
-- Import other `.view` files as reusable components. Press W or click the view button in the toolbar to pick from existing `.view` files in the project. Imported views render inline on the canvas.
-- Resize elements by dragging selection handles. Move absolutely-positioned elements by dragging.
-- Undo/redo with Cmd+Z and Shift+Cmd+Z.
-- Duplicate elements with Cmd+D.
-- Delete elements with Backspace or Delete.
-- Press Esc or click the back arrow to return to the main editor.
-- A "Sample View" option is available in the sidebar context menu that creates a fully commented example file demonstrating all .view features.
-
-### File Management
-
-- Sidebar shows a file tree of everything in `.vibe/`. Notes (.md, .mmd, .view) are shown in the main tree. Non-note files (images, data, etc.) appear in a collapsible Resources section at the bottom.
-- Files are sorted by type (folders first, then notes, diagrams, views) and alphabetically within each group.
-- Create new notes, diagrams, views, and folders by right-clicking in the sidebar or on a folder.
-- Rename files and folders by triple-clicking their name in the sidebar, or through the right-click context menu. Duplicate names are detected and blocked with a visual indicator.
-- Delete files and folders through the right-click context menu. A confirmation dialog appears.
-- Drag and drop files and folders into other folders to move them. A visual indicator shows the drop target. Conflicts (name collisions) are shown in red and blocked.
-- Folders can be collapsed and expanded. Their state is persisted across sessions.
-- The sidebar can be toggled with the hamburger button or Cmd+B.
-
-### Terminal
-
-- Integrated terminal panel on the right side of the window, powered by xterm.js and a real PTY backend.
-- Multiple terminal tabs. Click + to add a new tab. Click the x on a tab to close it.
-- When a shell exits, the tab is marked with a strikethrough label.
-- Terminal panel is resizable by dragging the divider between the editor and terminal.
-- Cmd+T creates a new terminal tab when the terminal panel is focused.
-
-### Quick Create and Quick Open
-
-- Cmd+N opens a quick create dialog. Type a path like `folder/subfolder/note.md` to create a file with intermediate directories. Omitting an extension defaults to `.md`. Path traversal outside the project is blocked.
-- Cmd+O opens a quick open dialog with fuzzy path matching. Arrow keys to navigate, Enter to open, Esc to cancel.
-
-### Theming
-
-- Shift+Cmd+T opens a theme editor. Every color in the UI is configurable: backgrounds, text colors, accent, border, success, error, inline code.
-- Changes preview in real time. Save to persist or Reset to restore defaults.
-- Theme is stored globally at `~/.config/vibe/theme.json` and applies across all projects.
-- Terminal colors are defined separately in the source and match the default earthy palette.
-
-### State Persistence
-
-- The app remembers which file was last open, which folders are collapsed, whether the sidebar is collapsed, and whether the UML preview was open. This state is stored per-project in `.vibe/.state`.
-- The global theme is stored at `~/.config/vibe/theme.json`.
-
-### File Watching
-
-- A backend filesystem watcher monitors the `.vibe/` directory and automatically refreshes the sidebar when files change outside the app.
-
-### Keyboard Shortcuts
-
-| Shortcut | Action |
-|---|---|
-| Cmd+N | Quick create file |
-| Cmd+O | Quick open file |
-| Cmd+B | Toggle sidebar |
-| Cmd+R | Toggle diagram preview (when editing .mmd) |
-| Cmd+T | New terminal tab (when terminal is focused) |
-| Shift+Cmd+T | Open theme editor |
-| Cmd+S | Save (auto-saves on change, this just blocks the browser dialog) |
-| Cmd+Z | Undo (view editor) |
-| Shift+Cmd+Z | Redo (view editor) |
-| Cmd+D | Duplicate element (view editor) |
-| Cmd+/Cmd- | Zoom diagram preview |
-| Esc | Exit view editor / close dialogs |
-| Shift+Enter | Deactivate current block (markdown editor) |
-
-### Architecture
-
-- **Frontend**: Vanilla HTML, CSS, and JS. No build step, no framework. Vendor libraries (marked.js, highlight.js, mermaid.js, xterm.js, jsPDF, js-yaml) are included as pre-built files in `ui/vendor/`.
-- **Backend**: Rust via Tauri 2. Handles file I/O, directory watching, and PTY management. The PTY layer uses the `portable-pty` crate.
-- **CLI**: A small Rust binary that finds and launches the Tauri app binary, pointing it at a target directory.
-- **Storage**: All project data lives in a `.vibe/` directory. No database, no cloud, no accounts.
+---
 
 ## License
 
