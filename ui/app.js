@@ -221,6 +221,7 @@ function initSidebar() {
     { label: "New Diagram", action: () => promptNewDiagram("") },
     { label: "New View", action: () => promptNewView("") },
     { label: "Sample View", action: () => createSampleView("") },
+    { label: "New Colors", action: () => createColorsView("") },
     { label: "New Folder", action: () => promptNewFolder("") },
   ];
   const sidebarContextTargets = [fileTree, sidebarSections, resourcesSection];
@@ -242,6 +243,7 @@ function initSidebar() {
       { label: "New Diagram", action: () => promptNewDiagram("") },
       { label: "New View", action: () => promptNewView("") },
       { label: "Sample View", action: () => createSampleView("") },
+      { label: "New Colors", action: () => createColorsView("") },
       { label: "New Folder", action: () => promptNewFolder("") },
     ]);
   });
@@ -427,6 +429,7 @@ function createResourceNode(node, parentPath) {
         { label: "New Diagram Here", action: () => promptNewDiagram(node.path || "") },
         { label: "New View Here", action: () => promptNewView(node.path || "") },
         { label: "Sample View", action: () => createSampleView(node.path || "") },
+        { label: "New Colors", action: () => createColorsView(node.path || "") },
         { label: "New Folder Here", action: () => promptNewFolder(node.path || "") },
         { label: "Rename Folder", action: () => {
           const currentItem = wrapper.querySelector('.tree-item');
@@ -540,6 +543,7 @@ function createTreeNode(node, parentPath) {
         { label: "New Diagram Here", action: () => promptNewDiagram(node.path || "") },
         { label: "New View Here", action: () => promptNewView(node.path || "") },
         { label: "Sample View", action: () => createSampleView(node.path || "") },
+        { label: "New Colors", action: () => createColorsView(node.path || "") },
         { label: "New Folder Here", action: () => promptNewFolder(node.path || "") },
         { label: "Rename Folder", action: () => {
           const currentWrapper = document.querySelector(`.tree-node-wrapper[data-node-path="${CSS.escape(node.path)}"]`);
@@ -574,10 +578,11 @@ function createTreeNode(node, parentPath) {
 
     const isMmd = node.name.endsWith(".mmd");
     const isView = node.name.endsWith(".view");
+    const isColors = node.name === "colors.view";
     const isMd = node.name.endsWith(".md");
-    const icon = isView ? "⊞" : isMmd ? "◇" : isMd ? "#" : "📄";
+    const icon = isColors ? "🎨" : isView ? "⊞" : isMmd ? "◇" : isMd ? "#" : "📄";
     const displayName = isMd ? node.name.slice(0, -3) : isMmd ? node.name.slice(0, -4) : isView ? node.name.slice(0, -5) : node.name;
-    item.innerHTML = `<span class="icon${isMmd ? ' uml-icon' : ''}${isView ? ' view-icon' : ''}">${icon}</span><span class="name">${escapeHtml(displayName)}</span>`;
+    item.innerHTML = `<span class="icon${isMmd ? ' uml-icon' : ''}${isView ? ' view-icon' : ''}${isColors ? ' colors-icon' : ''}">${icon}</span><span class="name">${escapeHtml(displayName)}</span>`;
 
     item.addEventListener("click", (e) => {
       if (e.detail === 3) {
@@ -955,7 +960,8 @@ async function promptNewView(parentDir) {
   const fileName = name.endsWith(".view") ? name : name + ".view";
   const path = parentDir ? `${parentDir}/${fileName}` : fileName;
   const isSample = fileName === "sample.view";
-  const content = isSample ? SAMPLE_VIEW_CONTENT : DEFAULT_VIEW_CONTENT;
+  const isColors = fileName === "colors.view";
+  const content = isSample ? SAMPLE_VIEW_CONTENT : isColors ? DEFAULT_COLORS_VIEW_CONTENT : DEFAULT_VIEW_CONTENT;
   try {
     await invoke("write_file", { path, content });
     await refreshFileTree();
@@ -973,6 +979,17 @@ async function createSampleView(parentDir) {
     openFile(path);
   } catch (e) {
     console.error("Failed to create sample view:", e);
+  }
+}
+
+async function createColorsView(parentDir) {
+  const path = parentDir ? `${parentDir}/colors.view` : "colors.view";
+  try {
+    await invoke("write_file", { path, content: DEFAULT_COLORS_VIEW_CONTENT });
+    await refreshFileTree();
+    openFile(path);
+  } catch (e) {
+    console.error("Failed to create colors view:", e);
   }
 }
 
@@ -1180,6 +1197,112 @@ tree:
         style:
           color: "$colors.muted"
           apply: "$typography.caption"
+`;
+
+const DEFAULT_COLORS_VIEW_CONTENT = `# Colors palette file.
+# Define named color swatches as frames. The "name" of each frame
+# becomes the palette key, and its "background" is the color value.
+# Other .view files in this project will automatically import these colors.
+
+name: Colors
+canvas:
+  width: 390
+  height: 844
+
+tree:
+  - id: root
+    type: frame
+    name: Root
+    style:
+      width: "100%"
+      height: "100%"
+      background: "#111111"
+      display: flex
+      flexDirection: column
+      padding: 24
+      gap: 12
+
+    children:
+      - id: el_1
+        type: frame
+        name: primary
+        style:
+          width: "100%"
+          height: 48
+          background: "#6366F1"
+          borderRadius: 8
+
+      - id: el_2
+        type: frame
+        name: secondary
+        style:
+          width: "100%"
+          height: 48
+          background: "#8B5CF6"
+          borderRadius: 8
+
+      - id: el_3
+        type: frame
+        name: surface
+        style:
+          width: "100%"
+          height: 48
+          background: "#1A1A1A"
+          borderRadius: 8
+
+      - id: el_4
+        type: frame
+        name: background
+        style:
+          width: "100%"
+          height: 48
+          background: "#0A0A0A"
+          borderRadius: 8
+
+      - id: el_5
+        type: frame
+        name: text
+        style:
+          width: "100%"
+          height: 48
+          background: "#FFFFFF"
+          borderRadius: 8
+
+      - id: el_6
+        type: frame
+        name: muted
+        style:
+          width: "100%"
+          height: 48
+          background: "#666666"
+          borderRadius: 8
+
+      - id: el_7
+        type: frame
+        name: border
+        style:
+          width: "100%"
+          height: 48
+          background: "#333333"
+          borderRadius: 8
+
+      - id: el_8
+        type: frame
+        name: error
+        style:
+          width: "100%"
+          height: 48
+          background: "#EF4444"
+          borderRadius: 8
+
+      - id: el_9
+        type: frame
+        name: success
+        style:
+          width: "100%"
+          height: 48
+          background: "#22C55E"
+          borderRadius: 8
 `;
 
 async function promptNewFolder(parentDir) {
@@ -3225,6 +3348,53 @@ const ViewEditor = (() => {
   let initialized = false;
   let dragState = null;
 
+  // ── Color palette from colors.view ──
+  // Map of { name: hexColor } loaded from colors.view files found in .vibe/
+  let palette = {};
+
+  async function loadPalette() {
+    palette = {};
+    try {
+      const tree = await invoke('get_file_tree');
+      const colorsFiles = [];
+      const walk = (node) => {
+        if (node.is_dir) {
+          for (const child of (node.children || [])) walk(child);
+        } else if (node.name === 'colors.view') {
+          colorsFiles.push(node.path);
+        }
+      };
+      walk(tree);
+      for (const path of colorsFiles) {
+        // Skip if this IS the colors.view we're currently editing
+        if (path === currentFilePath) continue;
+        try {
+          const content = await invoke('read_file', { path });
+          const obj = jsyaml.load(content);
+          if (!obj || !obj.tree) continue;
+          const extractColors = (nodes) => {
+            for (const node of nodes) {
+              // A frame with a name and a background color = a palette swatch
+              if (node.type === 'frame' && node.name && node.style?.background) {
+                const bg = node.style.background;
+                // Only accept direct color values, not token refs or gradients
+                if (typeof bg === 'string' && /^#[0-9a-fA-F]{3,8}$/.test(bg.trim())) {
+                  palette[node.name] = bg.trim();
+                }
+              }
+              if (node.children) extractColors(node.children);
+            }
+          };
+          extractColors(obj.tree);
+        } catch (e) {
+          console.warn('Failed to parse colors.view at', path, e);
+        }
+      }
+    } catch (e) {
+      console.warn('Failed to load palette:', e);
+    }
+  }
+
   // DOM refs (lazy)
   let $canvasBg, $canvas, $selOverlay, $layerTree, $propsContent, $propsTitle, $canvasW, $canvasH, $zoomDisplay;
 
@@ -3753,6 +3923,34 @@ const ViewEditor = (() => {
       ci.addEventListener('change', () => pushHist());
       ti.addEventListener('change', () => { ci.value = toHex6(ti.value) || '#000000'; onChange(ti.value); pushHist(); });
       row.append(ci, ti);
+
+      // Palette swatches from colors.view
+      const paletteKeys = Object.keys(palette);
+      if (paletteKeys.length > 0) {
+        const swatchRow = document.createElement('div'); swatchRow.className = 've-palette-row';
+        for (const name of paletteKeys) {
+          const hex = palette[name];
+          const swatch = document.createElement('div');
+          swatch.className = 've-palette-swatch';
+          swatch.style.background = hex;
+          swatch.title = name + ' (' + hex + ')';
+          // Highlight if currently selected
+          if (value && value.toLowerCase() === hex.toLowerCase()) {
+            swatch.classList.add('ve-palette-swatch-active');
+          }
+          swatch.addEventListener('click', () => {
+            ci.value = toHex6(hex) || '#000000';
+            ti.value = hex;
+            onChange(hex);
+            pushHist();
+            // Update active state on all siblings
+            swatchRow.querySelectorAll('.ve-palette-swatch').forEach(s => s.classList.remove('ve-palette-swatch-active'));
+            swatch.classList.add('ve-palette-swatch-active');
+          });
+          swatchRow.appendChild(swatch);
+        }
+        row.appendChild(swatchRow);
+      }
     } else if (type === 'select') {
       const sel = document.createElement('select'); sel.className = 've-prop-select';
       for (const opt of (options || [])) { const o = document.createElement('option'); o.value = opt; o.textContent = opt || '—'; if (opt == value) o.selected = true; sel.appendChild(o); }
@@ -4302,31 +4500,35 @@ const ViewEditor = (() => {
   // ── Public API ──
 
   return {
-    load(yamlStr) {
+    async load(yamlStr) {
       initRefs();
       bindEvents();
       try { doc = fromYAML(yamlStr); } catch (e) { console.error('Failed to parse .view:', e); doc = createDefaultDoc(); }
       selectedId = null; hoveredId = null; activeTool = 'select';
       history.stack = []; history.idx = -1;
       pushHist();
+      // Load color palette from colors.view (async, re-renders props when ready)
+      await loadPalette();
       updateCanvasSize(); render(); renderLayerTree(); renderProps();
     },
-    loadDefault() {
+    async loadDefault() {
       initRefs();
       bindEvents();
       doc = createDefaultDoc();
       selectedId = null; hoveredId = null; activeTool = 'select';
       history.stack = []; history.idx = -1;
       pushHist();
+      await loadPalette();
       updateCanvasSize(); render(); renderLayerTree(); renderProps();
     },
     getContent() { return toYAML(doc); },
+    getPalette() { return palette; },
   };
 })();
 
 // Bridge functions called from the main app flow
-function veLoadFile(content) {
-  ViewEditor.load(content);
+async function veLoadFile(content) {
+  await ViewEditor.load(content);
   const name = currentFilePath ? currentFilePath.split("/").pop() : "untitled.view";
   document.getElementById("ve-file-name").textContent = name;
 }
